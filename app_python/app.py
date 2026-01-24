@@ -84,6 +84,9 @@ async def root(request: Request):
     Main endpoint that returns service, system, and runtime information.
     """
     up = get_uptime_seconds()
+
+    logger.info(f"Received request: {request.method} {request.url.path} from {request.client.host}")
+
     return {
         "service": {
             "name": SERVICE_NAME,
@@ -111,11 +114,13 @@ async def root(request: Request):
     }
 
 @app.get("/health", response_class=JSONResponse)
-async def health():
+async def health(request: Request):
     """
     Health check endpoint for monitoring.
     """
     up = get_uptime_seconds()
+
+    logger.info(f"Received health check request: {request.method} {request.url.path} from {request.client.host}")
     return {
         "status": "healthy",
         "timestamp": iso_utc_now(),
@@ -124,6 +129,7 @@ async def health():
 
 @app.exception_handler(404)
 async def not_found_exception(request: Request, exc: HTTPException):
+    logger.error(f"404 Error: {exc.detail} for {request.url.path}")
     return JSONResponse(
         status_code=404,
         content={"message": "Endpoint not found", "error": str(exc)},
@@ -131,12 +137,12 @@ async def not_found_exception(request: Request, exc: HTTPException):
 
 @app.exception_handler(500)
 async def internal_server_error(request: Request, exc: HTTPException):
+    logger.error(f"500 Error: {str(exc)} for {request.url.path}")
     return JSONResponse(
         status_code=500,
         content={"message": "Internal server error", "error": str(exc)},
     )
 
 if __name__ == "__main__":
-
-    # uvicorn needs "app:app" reference
+    logger.info(f"Starting server on {HOST}:{PORT} with DEBUG={DEBUG}")
     uvicorn.run("app:app", host=HOST, port=PORT, reload=DEBUG)
