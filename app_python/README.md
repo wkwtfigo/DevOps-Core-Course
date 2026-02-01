@@ -114,3 +114,34 @@ The following environment variables can be configured to change the application 
 |HOST	|Host |IP address|	0.0.0.0|
 |PORT	|Port number|	5000|
 |DEBUG	|Enable/Disable |debug mode|	False|
+
+## Docker
+
+### Build locally
+Pattern:
+- Build an image from the Dockerfile in this directory:
+  - `docker build -t <image_name>:<tag> .`
+
+Notes:
+- Local builds do not require Docker Hub naming. Example image name: `devops-info-service:lab02`.
+
+### Run locally
+Pattern:
+- Run and publish the container port:
+  - `docker run --rm --name <container_name> -p <host_port>:5000 <image_name>:<tag>`
+
+Example:
+- `docker run --rm --name devops-info -p 5000:5000 devops-info-service:lab02`
+
+Optional environment overrides (if needed):
+- `-e HOST=<host> -e DEBUG=<TRUE|FALSE>`
+
+Note:
+- The container is designed to listen on port **5000** by default. It is recommended to keep the internal port unchanged and only remap the host port using `-p`.
+
+### Pull from Docker Hub
+Pattern:
+- Pull:
+  - `docker pull <dockerhub_username>/<repo_name>:<tag>`
+- Run:
+  - `docker run --rm -p <host_port>:5000 <dockerhub_username>/<repo_name>:<tag>`
