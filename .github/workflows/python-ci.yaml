@@ -2,12 +2,12 @@ name: Python CI
 
 on:
   push:
-    branches: [ "master", "lab03" ]
+    branches: ["master", "lab03"]
     paths:
       - "app_python/**"
       - ".github/workflows/python-ci.yaml"
   pull_request:
-    branches: [ "master", "lab03" ]
+    branches: ["master", "lab03"]
     paths:
       - "app_python/**"
       - ".github/workflows/python-ci.yaml"
@@ -42,12 +42,12 @@ jobs:
           cache: pip
           cache-dependency-path: |
             app_python/requirements.txt
+            app_python/requirements-dev.txt
 
-      - name: Install dependencies (app + dev tools)
+      - name: Install dependencies (app + dev)
         run: |
           python -m pip install --upgrade pip
-          pip install -r requirements.txt
-          pip install ruff pytest httpx
+          pip install -r requirements.txt -r requirements-dev.txt
 
       - name: Lint (ruff)
         run: ruff check .
@@ -90,19 +90,6 @@ jobs:
             wkwtfigo/devops-info-service:lab03
             wkwtfigo/devops-info-service:${{ steps.ver.outputs.version }}
 
-      - name: Setup Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: "3.13"
-          cache: pip
-          cache-dependency-path: |
-            app_python/requirements.txt
-
-      - name: Install deps for Snyk
-        run: |
-          python -m pip install --upgrade pip
-          pip install -r app_python/requirements.txt
-
       - name: Install Snyk CLI
         run: npm install -g snyk
 
@@ -113,4 +100,3 @@ jobs:
         run: |
           snyk auth "$SNYK_TOKEN"
           snyk test --file=app_python/requirements.txt --severity-threshold=high --skip-unresolved
-
