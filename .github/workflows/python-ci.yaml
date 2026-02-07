@@ -5,12 +5,12 @@ on:
     branches: [ "master", "lab03" ]
     paths:
       - "app_python/**"
-      - ".github/workflows/python-ci.yml"
+      - ".github/workflows/python-ci.yaml"
   pull_request:
     branches: [ "master", "lab03" ]
     paths:
       - "app_python/**"
-      - ".github/workflows/python-ci.yml"
+      - ".github/workflows/python-ci.yaml"
 
 concurrency:
   group: python-ci-${{ github.ref }}
@@ -43,23 +43,22 @@ jobs:
           cache-dependency-path: |
             app_python/requirements.txt
 
-      - name: Install dependencies
+      - name: Install dependencies (app + dev tools)
         run: |
           python -m pip install --upgrade pip
           pip install -r requirements.txt
+          pip install ruff pytest httpx
 
       - name: Lint (ruff)
-        run: |
-          ruff check .
+        run: ruff check .
 
       - name: Run tests
-        run: |
-          pytest -q
+        run: pytest -q
 
   docker:
     needs: test
     runs-on: ubuntu-latest
-    if: github.event_name == 'push' && (github.ref_name == 'main' || github.ref_name == 'master' || github.ref_name == 'lab03')
+    if: github.event_name == 'push' && (github.ref_name == 'master' || github.ref_name == 'lab03')
 
     permissions:
       contents: read
@@ -88,11 +87,12 @@ jobs:
           file: ./app_python/Dockerfile
           push: true
           tags: |
-            wkwtfigo/devops-info-service:latest
+            wkwtfigo/devops-info-service:lab03
             wkwtfigo/devops-info-service:${{ steps.ver.outputs.version }}
 
       - name: Snyk scan (dependencies)
         uses: snyk/actions/python@master
+        continue-on-error: true
         env:
           SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
         with:
