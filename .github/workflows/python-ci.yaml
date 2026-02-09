@@ -53,8 +53,7 @@ jobs:
         run: ruff check .
 
       - name: Run tests
-        run: pytest -q \
-          --cov=app --cov-report=term-missing
+        run: pytest -q
 
   docker:
     needs: test
