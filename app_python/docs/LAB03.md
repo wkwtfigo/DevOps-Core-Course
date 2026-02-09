@@ -136,11 +136,81 @@ Tests run on Python 3.12 and 3.13, which increases confidence that the service w
 
 ### 3.3 Dependency caching
 
-`actions/setup-python` is configured with pip caching using:
-- `app_python/requirements.txt`
-- `app_python/requirements-dev.txt`
+Dependency caching is implemented using `actions/setup-python` with pip cache enabled:
 
-This reduces CI runtime by reusing cached wheels between runs.
+```yaml
+cache: pip
+cache-dependency-path:
+  - app_python/requirements.txt
+  - app_python/requirements-dev.txt
+```
+
+Cache behavior was verified using two workflow runs:
+- Without cache: dependencies were downloaded from PyPI
+- With cache: pip reused locally cached wheels ("Using cached ...")
+
+In this project, dependency installation time remained around ~9 seconds in both cases because the dependency set is small and installs quickly.
+
+However, caching still prevents repeated downloads and becomes significantly more beneficial for larger projects with heavy dependencies.
+
+`pip` logs without cache:
+```bash
+Downloading httpx-0.28.1-py3-none-any.whl (73 kB)
+Downloading httpcore-1.0.9-py3-none-any.whl (78 kB)
+Downloading annotated_types-0.7.0-py3-none-any.whl (13 kB)
+Downloading click-8.3.1-py3-none-any.whl (108 kB)
+Downloading coverage-7.13.4-cp312-cp312-manylinux1_x86_64.manylinux_2_28_x86_64.manylinux_2_5_x86_64.whl (254 kB)
+Downloading h11-0.16.0-py3-none-any.whl (37 kB)
+Downloading httptools-0.7.1-cp312-cp312-manylinux1_x86_64.manylinux_2_28_x86_64.manylinux_2_5_x86_64.whl (517 kB)
+Downloading idna-3.11-py3-none-any.whl (71 kB)
+Downloading iniconfig-2.3.0-py3-none-any.whl (7.5 kB)
+Downloading packaging-26.0-py3-none-any.whl (74 kB)
+Downloading pygments-2.19.2-py3-none-any.whl (1.2 MB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 1.2/1.2 MB 89.3 MB/s  0:00:00
+Downloading python_dotenv-1.2.1-py3-none-any.whl (21 kB)
+Downloading pyyaml-6.0.3-cp312-cp312-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl (807 kB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 807.9/807.9 kB 68.2 MB/s  0:00:00
+Downloading typing_extensions-4.15.0-py3-none-any.whl (44 kB)
+Downloading typing_inspection-0.4.2-py3-none-any.whl (14 kB)
+Downloading uvloop-0.22.1-cp312-cp312-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl (4.4 MB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 4.4/4.4 MB 118.8 MB/s  0:00:00
+Downloading watchfiles-1.1.1-cp312-cp312-manylinux_2_17_x86_64.manylinux2014_x86_64.whl (456 kB)
+Downloading websockets-16.0-cp312-cp312-manylinux1_x86_64.manylinux_2_28_x86_64.manylinux_2_5_x86_64.whl (184 kB)
+Downloading certifi-2026.1.4-py3-none-any.whl (152 kB)
+```
+
+`pip` logs with cache:
+```bash
+Using cached fastapi-0.115.0-py3-none-any.whl (94 kB)
+Using cached uvicorn-0.30.6-py3-none-any.whl (62 kB)
+Using cached pydantic-2.12.5-py3-none-any.whl (463 kB)
+Using cached pydantic_core-2.41.5-cp312-cp312-manylinux_2_17_x86_64.manylinux2014_x86_64.whl (2.1 MB)
+Using cached starlette-0.38.6-py3-none-any.whl (71 kB)
+Using cached anyio-4.12.1-py3-none-any.whl (113 kB)
+Using cached pytest-9.0.2-py3-none-any.whl (374 kB)
+Using cached pluggy-1.6.0-py3-none-any.whl (20 kB)
+Using cached pytest_cov-7.0.0-py3-none-any.whl (22 kB)
+Using cached ruff-0.15.0-py3-none-manylinux_2_17_x86_64.manylinux2014_x86_64.whl (11.1 MB)
+Using cached httpx-0.28.1-py3-none-any.whl (73 kB)
+Using cached httpcore-1.0.9-py3-none-any.whl (78 kB)
+Using cached annotated_types-0.7.0-py3-none-any.whl (13 kB)
+Using cached click-8.3.1-py3-none-any.whl (108 kB)
+Downloading coverage-7.13.4-cp312-cp312-manylinux1_x86_64.manylinux_2_28_x86_64.manylinux_2_5_x86_64.whl (254 kB)
+Using cached h11-0.16.0-py3-none-any.whl (37 kB)
+Using cached httptools-0.7.1-cp312-cp312-manylinux1_x86_64.manylinux_2_28_x86_64.manylinux_2_5_x86_64.whl (517 kB)
+Using cached idna-3.11-py3-none-any.whl (71 kB)
+Using cached iniconfig-2.3.0-py3-none-any.whl (7.5 kB)
+Using cached packaging-26.0-py3-none-any.whl (74 kB)
+Using cached pygments-2.19.2-py3-none-any.whl (1.2 MB)
+Using cached python_dotenv-1.2.1-py3-none-any.whl (21 kB)
+Using cached pyyaml-6.0.3-cp312-cp312-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl (807 kB)
+Using cached typing_extensions-4.15.0-py3-none-any.whl (44 kB)
+Using cached typing_inspection-0.4.2-py3-none-any.whl (14 kB)
+Using cached uvloop-0.22.1-cp312-cp312-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl (4.4 MB)
+Using cached watchfiles-1.1.1-cp312-cp312-manylinux_2_17_x86_64.manylinux2014_x86_64.whl (456 kB)
+Using cached websockets-16.0-cp312-cp312-manylinux1_x86_64.manylinux_2_28_x86_64.manylinux_2_5_x86_64.whl (184 kB)
+Using cached certifi-2026.1.4-py3-none-any.whl (152 kB)
+```
 
 ### 3.4 Path filtering
 
@@ -172,11 +242,10 @@ snyk test --file=app_python/requirements.txt --severity-threshold=high --skip-un
 
 **Result:**
 
-- Snyk findings: <PASTE: 0 issues OR N issues>
+- Snyk findings: `0 high-severity vulnerabilities`
 - Action taken:
-    - If findings exist: describe whether you upgraded dependencies or left as known risk
-    - The step is configured with continue-on-error: true to keep CI green while still reporting risks (appropriate for a training project).
-
+    - No vulnerabilities were found in the project.
+    
 ![snyk output](/app_python/docs/screenshots/snyk.png)
 
 ## 5. Key Decisions
