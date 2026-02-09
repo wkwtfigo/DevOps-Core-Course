@@ -1,0 +1,28 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.pytest_cache/
+.mypy_cache/
+
+# Virtual envs
+venv/
+.venv/
+
+# VCS / IDE
+.git/
+.idea/
+.vscode/
+
+# OS junk
+.DS_Store
+Thumbs.db
+
+# Project docs/tests not needed at runtime
+docs/
+tests/
+
+# Markdown/images not needed at runtime
+*.md
+*.png
