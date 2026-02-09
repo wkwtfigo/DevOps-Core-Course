@@ -1,5 +1,7 @@
 # DevOps Info Service
 
+![Python CI](https://github.com/wkwtfigo/DevOps-Core-Course/actions/workflows/python-ci.yaml/badge.svg)
+
 ## Overview
 The **DevOps Info Service** is a simple web service built with **FastAPI** that provides system information, including:
 - Service metadata (name, version, description)
@@ -30,8 +32,13 @@ To set up the project locally, follow these steps:
       ```
 
 3. **Install dependencies:**
+    for running the app:
     ```bash
     pip install -r requirements.txt
+    ```
+    for tests/lint:
+    ```bash
+    pip install -r requirements.txt -r requirements-dev.txt
     ```
 
 ## Running the Application
@@ -114,6 +121,19 @@ The following environment variables can be configured to change the application 
 |HOST	|Host |IP address|	0.0.0.0|
 |PORT	|Port number|	5000|
 |DEBUG	|Enable/Disable |debug mode|	False|
+
+## Testing
+
+Install dev dependencies:
+```bash
+pip install -r requirements.txt -r requirements-dev.txt
+```
+
+Run unit tests:
+
+```bash
+pytest -q
+```
 
 ## Docker
 

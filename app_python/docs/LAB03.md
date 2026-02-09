@@ -9,6 +9,24 @@ This lab implements a CI/CD pipeline for the **DevOps Info Service** using **Git
 - **Container build & publish:** Docker Buildx → Docker Hub
 - **Security scanning:** Snyk CLI (dependency scan from `requirements.txt`)
 
+### Testing framework choice
+
+Two common Python testing frameworks were considered:
+
+- **unittest** — built-in Python testing framework with class-based test structure.
+- **pytest** — third-party framework with simpler syntax, fixtures, and better readability.
+
+**Chosen framework: pytest**
+
+**Justification:**
+- simpler test syntax (plain functions instead of classes)
+- powerful fixtures and ecosystem
+- widely used in modern Python projects
+- better failure output and developer experience
+- easy integration with CI pipelines
+
+For this project, pytest provides a clean and maintainable way to test API endpoints.
+
 **What is tested:**
 - `GET /` returns a valid JSON structure with required sections (`service`, `system`, `runtime`, `request`, `endpoints`)
 - `GET /health` returns `"status": "healthy"` and includes `timestamp` and `uptime_seconds`
@@ -28,18 +46,11 @@ This lab implements a CI/CD pipeline for the **DevOps Info Service** using **Git
 
 ### 2.1 GitHub Actions run
 - Workflow file: `.github/workflows/python-ci.yaml`
-- Successful run link: **<PASTE LINK TO ACTION RUN HERE>**
+- Successful run link: **<https://github.com/wkwtfigo/DevOps-Core-Course/actions/runs/21838910478>**
 
 ### 2.2 Test + lint output (CI)
-Paste minimal evidence (or screenshots):
-- Ruff:
-```text
-<PASTE ruff output here>
-``` 
-- Pytest:
-```text
-<PASTE pytest output here>
-```
+
+![lint and test evidence](/app_python/docs/screenshots/lint+test.png)
 
 ### 2.3 Docker image publish
 Docker Hub repository:
@@ -51,7 +62,66 @@ https://hub.docker.com/r/wkwtfigo/devops-info-service
 
 Published tags from CI:
 - `lab03`
-- `YYYY.MM.DD-<shortSHA>`
+- `2026.02.09-1d708b5`
+
+```bash
+#21 pushing ***/devops-info-service:lab03 with docker
+#21 pushing layer bf48bca45dca
+#21 pushing layer 220bf4a7cb08
+#21 pushing layer 473bf974db40
+#21 pushing layer f73c1c8fba85
+#21 pushing layer 96c05063c739
+#21 pushing layer 241fcae5008f
+#21 pushing layer 61e0df330e38
+#21 pushing layer 1dfdd9260fd4
+#21 pushing layer 0ae7ca672022
+#21 pushing layer a8ff6f8cbdfd
+#21 pushing layer 473bf974db40 512B / 42B 0.2s
+#21 pushing layer bf48bca45dca 7.17kB / 4.72kB 0.3s
+#21 pushing layer 473bf974db40 2.56kB / 42B 0.3s
+#21 pushing layer f73c1c8fba85 1.65MB / 9.48MB 0.4s
+#21 pushing layer 96c05063c739 11.78kB / 3.87kB 0.3s
+#21 pushing layer f73c1c8fba85 5.40MB / 9.48MB 0.5s
+#21 pushing layer 220bf4a7cb08 2.31MB / 38.07MB 0.5s
+#21 pushing layer f73c1c8fba85 8.84MB / 9.48MB 0.6s
+#21 pushing layer 220bf4a7cb08 8.64MB / 38.07MB 0.7s
+#21 pushing layer f73c1c8fba85 9.49MB / 9.48MB 0.6s
+#21 pushing layer 220bf4a7cb08 11.77MB / 38.07MB 0.8s
+#21 pushing layer 220bf4a7cb08 14.52MB / 38.07MB 0.9s
+#21 pushing layer 220bf4a7cb08 17.65MB / 38.07MB 1.0s
+#21 pushing layer 220bf4a7cb08 20.40MB / 38.07MB 1.2s
+#21 pushing layer 220bf4a7cb08 22.76MB / 38.07MB 1.3s
+#21 pushing layer 96c05063c739 1.3s done
+#21 pushing layer 220bf4a7cb08 26.30MB / 38.07MB 1.4s
+#21 pushing layer 473bf974db40 1.3s done
+#21 pushing layer bf48bca45dca 1.4s done
+#21 pushing layer 220bf4a7cb08 33.37MB / 38.07MB 1.6s
+#21 pushing layer 220bf4a7cb08 36.51MB / 38.07MB 1.7s
+#21 pushing layer 220bf4a7cb08 38.92MB / 38.07MB 1.8s
+#21 pushing layer f73c1c8fba85 2.1s done
+#21 pushing layer 241fcae5008f 2.5s done
+#21 pushing layer 220bf4a7cb08 3.1s done
+#21 pushing layer 0ae7ca672022 5.9s done
+#21 pushing layer 61e0df330e38 5.9s done
+#21 pushing layer 1dfdd9260fd4 5.9s done
+#21 pushing layer a8ff6f8cbdfd 5.9s done
+#21 DONE 6.0s
+
+#22 pushing ***/devops-info-service:2026.02.09-1d708b5 with docker
+#22 pushing layer a8ff6f8cbdfd 1.9s done
+#22 pushing layer bf48bca45dca 1.9s done
+#22 pushing layer 220bf4a7cb08 1.9s done
+#22 pushing layer 473bf974db40 1.9s done
+#22 pushing layer f73c1c8fba85 1.9s done
+#22 pushing layer 96c05063c739 1.9s done
+#22 pushing layer 241fcae5008f 1.9s done
+#22 pushing layer 61e0df330e38 1.9s done
+#22 pushing layer 1dfdd9260fd4 1.9s done
+#22 pushing layer 0ae7ca672022 1.9s done
+#22 DONE 1.9s
+```
+
+![docker hub](/app_python/docs/screenshots/dockerhub.png)
 
 ## 3. Best Practices Implemented
 ### 3.1 Separation of concerns (jobs)
@@ -107,7 +177,7 @@ snyk test --file=app_python/requirements.txt --severity-threshold=high --skip-un
     - If findings exist: describe whether you upgraded dependencies or left as known risk
     - The step is configured with continue-on-error: true to keep CI green while still reporting risks (appropriate for a training project).
 
-<PASTE snyk output excerpt here>
+![snyk output](/app_python/docs/screenshots/snyk.png)
 
 ## 5. Key Decisions
 
