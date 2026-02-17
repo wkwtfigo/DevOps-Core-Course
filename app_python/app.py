@@ -7,7 +7,7 @@ import uvicorn
 from datetime import datetime, timezone
 
 from fastapi import FastAPI, Request, HTTPException
-from fastapi.responses import JSONResponse 
+from fastapi.responses import JSONResponse
 
 # Configure logging
 logging.basicConfig(
@@ -25,7 +25,8 @@ DEBUG = os.getenv("DEBUG", "FALSE").lower() == "true"
 
 SERVICE_NAME = os.getenv("SERVICE_NAME", "devops-info-service")
 SERVICE_VERSION = os.getenv("SERVICE_VERSION", "1.0.0")
-SERVICE_DESCRIPTION = os.getenv("SERVICE_DESCRIPTION", "DevOps course info service")
+SERVICE_DESCRIPTION = os.getenv("SERVICE_DESCRIPTION",
+                                "DevOps course info service")
 FRAMEWORK = "FastAPI"
 
 START_TIME = time.time()
@@ -35,6 +36,7 @@ app = FastAPI(
     version=SERVICE_VERSION,
     description=SERVICE_DESCRIPTION,
 )
+
 
 def get_uptime_seconds():
     """
@@ -50,12 +52,14 @@ def get_uptime_seconds():
         'human': f"{hours} hours, {minutes} minutes"
     }
 
+
 def iso_utc_now() -> str:
     """
     Get current time in ISO 8601 UTC format.
     """
     dt = datetime.now(timezone.utc)
     return dt.strftime("%Y-%m-%dT%H:%M:%S.%f")[:-3] + "Z"
+
 
 def system_info() -> dict:
     """
@@ -70,6 +74,7 @@ def system_info() -> dict:
         "python_version": platform.python_version(),
     }
 
+
 def client_ip_from_request(request: Request) -> str:
     """
     Extract client IP address from request.
@@ -78,14 +83,17 @@ def client_ip_from_request(request: Request) -> str:
         return request.client.host
     return "unknown"
 
+
 @app.get("/", response_class=JSONResponse)
 async def root(request: Request):
     """
     Main endpoint that returns service, system, and runtime information.
     """
     up = get_uptime_seconds()
-
-    logger.info(f"Received request: {request.method} {request.url.path} from {request.client.host}")
+    logger.info(
+        f"Received request: {request.method} \
+            {request.url.path} from {request.client.host}"
+    )
 
     return {
         "service": {
@@ -108,10 +116,19 @@ async def root(request: Request):
             "path": request.url.path,
         },
         "endpoints": [
-            {"path": "/", "method": "GET", "description": "Service information"},
-            {"path": "/health", "method": "GET", "description": "Health check"},
+            {
+                "path": "/",
+                "method": "GET",
+                "description": "Service information"
+                },
+            {
+                "path": "/health",
+                "method": "GET",
+                "description": "Health check"
+                },
         ],
     }
+
 
 @app.get("/health", response_class=JSONResponse)
 async def health(request: Request):
@@ -120,12 +137,17 @@ async def health(request: Request):
     """
     up = get_uptime_seconds()
 
-    logger.info(f"Received health check request: {request.method} {request.url.path} from {request.client.host}")
+    logger.info(
+        f"Received health check request: \
+            {request.method} {request.url.path} \
+                 from {request.client.host}"
+    )
     return {
         "status": "healthy",
         "timestamp": iso_utc_now(),
         "uptime_seconds": up['seconds'],
     }
+
 
 @app.exception_handler(404)
 async def not_found_exception(request: Request, exc: HTTPException):
@@ -135,6 +157,7 @@ async def not_found_exception(request: Request, exc: HTTPException):
         content={"message": "Endpoint not found", "error": str(exc)},
     )
 
+
 @app.exception_handler(500)
 async def internal_server_error(request: Request, exc: HTTPException):
     logger.error(f"500 Error: {str(exc)} for {request.url.path}")
@@ -142,6 +165,7 @@ async def internal_server_error(request: Request, exc: HTTPException):
         status_code=500,
         content={"message": "Internal server error", "error": str(exc)},
     )
+
 
 if __name__ == "__main__":
     logger.info(f"Starting server on {HOST}:{PORT} with DEBUG={DEBUG}")
