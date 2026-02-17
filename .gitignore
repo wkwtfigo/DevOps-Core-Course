@@ -1,1 +1,42 @@
-test
+# --- OS / IDE ---
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+
+# --- Python ---
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+.venv/
+venv/
+.env
+
+# --- Terraform ---
+.terraform/
+*.tfstate
+*.tfstate.*
+crash.log
+crash.*.log
+*.tfvars
+*.tfvars.json
+override.tf
+override.tf.json
+*_override.tf
+*_override.tf.json
+
+# --- Pulumi ---
+.pulumi/
+pulumi.*.log
+
+# Stack config files often contain values you don't want in git (and may contain secrets)
+Pulumi.*.yaml
+!Pulumi.yaml
+
+# --- Secrets / keys ---
+**/key.json
+**/*.pem
+**/*.p12
+**/*.pfx
+**/*passphrase*
