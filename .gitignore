@@ -40,3 +40,9 @@ Pulumi.*.yaml
 **/*.p12
 **/*.pfx
 **/*passphrase*
+
+# Ansible
+*.retry
+.vault_pass
+ansible/inventory/*.pyc
+__pycache__/
